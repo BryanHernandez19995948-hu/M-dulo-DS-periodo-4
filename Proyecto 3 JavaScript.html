@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco Digital De Los Pemiausa</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .atm-card {
+            background-color: #0d2c4e;
+            padding: 2.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .atm-title {
+            color: #ffffff;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            font-family: 'Georgia', serif;
+        }
+
+        .screen {
+            background-color: #121212;
+            border: 2px solid #1e3a5f;
+            border-radius: 10px;
+            padding: 1.5rem 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .balance-text {
+            color: #20e663;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+        }
+
+        .instruction-text {
+            color: #e2a000;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.05rem;
+            font-weight: bold;
+        }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .monto-input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+        }
+
+        .monto-input:focus {
+            border-color: #0056b3;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: none;
+            padding: 0.75rem 1.2rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.1s ease, background-color 0.2s ease;
+            color: white;
+            flex: 1;
+            min-width: 110px;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-deposit {
+            background-color: #28a745;
+        }
+        .btn-deposit:hover {
+            background-color: #218838;
+        }
+
+        .btn-withdraw {
+            background-color: #dc3545;
+        }
+        .btn-withdraw:hover {
+            background-color: #c82333;
+        }
+
+        .btn-check {
+            background-color: #f3ad0c;
+            color: #0d2c4e;
+            width: 100%;
+            margin-top: 5px;
+        }
+        .btn-check:hover {
+            background-color: #d99909;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="atm-card">
+        <h2 class="atm-title">Banco Digital De Los Pemiausa</h2>
+
+        <div class="screen">
+            <p class="balance-text" id="balanceDisplay">Saldo Actual: $<span id="saldo">1000</span></p>
+            <p class="instruction-text" id="mensajeEstado">Selecciona una operación</p>
+        </div>
+
+        <div class="input-group">
+            <input type="number" id="montoInput" class="monto-input" placeholder="Ingresa el monto $" min="1">
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-deposit" onclick="depositar()">Depositar</button>
+            <button class="btn btn-withdraw" onclick="retirar()">Retirar</button>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <button class="btn btn-check" onclick="consultarSaldo()">Consultar Saldo</button>
+        </div>
+    </div>
+
+    <script>
+        let saldoActual = 1000;
+        const LIMITE_MAXIMO_RETIRO = 500; 
+
+        const saldoElemento = document.getElementById('saldo');
+        const mensajeElemento = document.getElementById('mensajeEstado');
+        const inputMonto = document.getElementById('montoInput');
+
+        function actualizarSaldo() {
+            saldoElemento.textContent = saldoActual;
+        }
+
+        function depositar() {
+            const monto = parseFloat(inputMonto.value);
+
+            if (isNaN(monto) || monto <= 0) {
+                mensajeElemento.textContent = "Ingresa un monto válido";
+                return;
+            }
+
+            saldoActual += monto;
+            actualizarSaldo();
+            mensajeElemento.textContent = `¡Depósito de $${monto} exitoso!`;
+            inputMonto.value = '';
+        }
+
+        function retirar() {
+            const monto = parseFloat(inputMonto.value);
+
+            if (isNaN(monto) || monto <= 0) {
+                mensajeElemento.textContent = "Ingresa un monto válido";
+                return;
+            }
+
+            if (monto > LIMITE_MAXIMO_RETIRO) {
+                mensajeElemento.textContent = `Límite superado: Máximo $${LIMITE_MAXIMO_RETIRO} por retiro`;
+                return;
+            }
+
+            if (monto > saldoActual) {
+                mensajeElemento.textContent = "Fondos insuficientes";
+                return;
+            }
+
+            saldoActual -= monto;
+            actualizarSaldo();
+            mensajeElemento.textContent = `¡Retiro de $${monto} exitoso!`;
+            inputMonto.value = '';
+        }
+
+        function consultarSaldo() {
+            mensajeElemento.textContent = `Tu saldo disponible es: $${saldoActual}`;
+            inputMonto.value = '';
+        }
+    </script>
+
+</body>
+</html>
